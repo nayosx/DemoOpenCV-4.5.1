@@ -1,11 +1,7 @@
 package com.ness.opencv;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import java.util.List;
@@ -28,11 +24,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.SurfaceView;
-import android.widget.Toast;
+
+import com.ness.opencv.util.S;
 
 public class OpenCVColorActivity extends AppCompatActivity implements View.OnTouchListener, CameraBridgeViewBase.CvCameraViewListener2 {
 
-    private static final String TAG = "OpenCVColorActivity";
     private boolean mIsColorSelected = false;
     private Mat mRgba;
     private Scalar mBlobColorRgba;
@@ -43,20 +39,16 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
     private Scalar CONTOUR_COLOR;
     private CameraBridgeViewBase cameraBridgeViewBase;
 
-    private final int REQUEST_CAMERA_PERMISSION = 200; //Este ID puede ser cualquiera, solamente se envia y espera a que regrese el mismo
-
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
-                case LoaderCallbackInterface.SUCCESS:
-                {
-                    Log.i(TAG, "OpenCV loaded successfully");
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i(S.OPENCV_COLOR_ACTIVITY, "OpenCV loaded successfully");
                     cameraBridgeViewBase.enableView();
                     cameraBridgeViewBase.setOnTouchListener(OpenCVColorActivity.this);
                 } break;
-                default:
-                {
+                default: {
                     super.onManagerConnected(status);
                 } break;
             }
@@ -64,13 +56,13 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
     };
 
     public OpenCVColorActivity() {
-        Log.i(TAG, "Instantiated new " + this.getClass());
+        Log.i(S.OPENCV_COLOR_ACTIVITY, "Instantiated new " + this.getClass());
     }
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "called onCreate");
+        Log.i(S.OPENCV_COLOR_ACTIVITY, "called onCreate");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -78,37 +70,25 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
 
         cameraBridgeViewBase = (CameraBridgeViewBase) findViewById(R.id.color_blob_detection_activity_surface_view);
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
-        //cameraBridgeViewBase.setCameraPermissionGranted(); // esto muestra un mensaje sino se le a consedido permisos a la camara
+        cameraBridgeViewBase.setCameraPermissionGranted(); // esto muestra un mensaje sino se le a consedido permisos a la camara
         cameraBridgeViewBase.setCvCameraViewListener(this);
-
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            if(shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                //Se deberia mandar a llarma un AlertDialog mas explicativo por aca
-                Toast.makeText(this, "Se necesita del permiso de camara", Toast.LENGTH_LONG).show();
-            }
-            ActivityCompat.requestPermissions(OpenCVColorActivity.this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        } else {
-            Toast.makeText(this, "Se supone el permiso esta dado", Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         if (cameraBridgeViewBase != null)
             cameraBridgeViewBase.disableView();
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            Log.d(S.OPENCV_COLOR_ACTIVITY, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
             OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
         } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
+            Log.d(S.OPENCV_COLOR_ACTIVITY, "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
@@ -143,7 +123,7 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
         int x = (int)event.getX() - xOffset;
         int y = (int)event.getY() - yOffset;
 
-        Log.i(TAG, "Touch image coordinates: (" + x + ", " + y + ")");
+        Log.i(S.OPENCV_COLOR_ACTIVITY, "Touch image coordinates: (" + x + ", " + y + ")");
 
         if ((x < 0) || (y < 0) || (x > cols) || (y > rows)) return false;
 
@@ -168,7 +148,7 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
 
         mBlobColorRgba = converScalarHsv2Rgba(mBlobColorHsv);
 
-        Log.i(TAG, "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
+        Log.i(S.OPENCV_COLOR_ACTIVITY, "Touched rgba color: (" + mBlobColorRgba.val[0] + ", " + mBlobColorRgba.val[1] +
                 ", " + mBlobColorRgba.val[2] + ", " + mBlobColorRgba.val[3] + ")");
 
         mDetector.setHsvColor(mBlobColorHsv);
@@ -189,7 +169,7 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
         if (mIsColorSelected) {
             mDetector.process(mRgba);
             List<MatOfPoint> contours = mDetector.getContours();
-            Log.e(TAG, "Contours count: " + contours.size());
+            Log.e(S.OPENCV_COLOR_ACTIVITY, "Contours count: " + contours.size());
             Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
 
             Mat colorLabel = mRgba.submat(4, 68, 4, 68);
@@ -208,18 +188,5 @@ public class OpenCVColorActivity extends AppCompatActivity implements View.OnTou
         Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
 
         return new Scalar(pointMatRgba.get(0, 0));
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if(requestCode ==  REQUEST_CAMERA_PERMISSION && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Se han otorgado los permisos necesarios");
-            cameraBridgeViewBase.setCameraPermissionGranted();
-        } else {
-            Toast.makeText(this, "Permisos de camara denegados!", Toast.LENGTH_SHORT).show();
-        }
     }
 }

@@ -29,7 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-public class FdActivity extends CameraActivity implements CvCameraViewListener2 {
+public class FaceDetectorActivity extends CameraActivity implements CvCameraViewListener2 {
 
     private static final String    TAG                 = "OCVSample::Activity";
     private static final Scalar    FACE_RECT_COLOR     = new Scalar(0, 255, 0, 255);
@@ -108,7 +108,7 @@ public class FdActivity extends CameraActivity implements CvCameraViewListener2 
         }
     };
 
-    public FdActivity() {
+    public FaceDetectorActivity() {
         mDetectorName = new String[2];
         mDetectorName[JAVA_DETECTOR] = "Java";
         mDetectorName[NATIVE_DETECTOR] = "Native (tracking)";

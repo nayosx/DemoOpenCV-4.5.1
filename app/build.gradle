@@ -33,6 +33,46 @@ android {
         pickFirst 'lib/x86_64/libc++_shared.so'
         pickFirst 'lib/armeabi-v7a/libc++_shared.so'
     }
+
+    externalNativeBuild {
+        cmake {
+            path "opencv451/libcxx_helper/CMakeLists.txt"
+        }
+        ndkBuild {
+            path "main/cpp/Android.mk"
+        }
+    }
+
+    sourceSets {
+        main {
+            jni.srcDirs = []
+            jniLibs.srcDirs=['libs']
+        }
+    }
+
+    splits {
+
+        // Configures multiple APKs based on ABI.
+        abi {
+
+            // Enables building multiple APKs per ABI.
+            enable true
+
+            // By default all ABIs are included, so use reset() and include to specify that we only
+            // want APKs for x86 and x86_64.
+
+            // Resets the list of ABIs that Gradle should create APKs for to none.
+            reset()
+
+            // Specifies a list of ABIs that Gradle should create APKs for.
+            // check this page for ABI
+            // https://developer.android.com/ndk/guides/abis.html#sa
+            include "arm64-v8a", "armeabi-v7a"
+
+            // Specifies that we do not want to also generate a universal APK that includes all ABIs.
+            universalApk false
+        }
+    }
 }
 
 dependencies {
