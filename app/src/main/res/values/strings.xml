@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">OpenCV</string>
+    <string name="btnTxtToColorCapture">Capturar Colores</string>
+    <string name="btnTxtCaptureFace">Capturar Rostro</string>
+    <string name="toCaptureCode">toCaptureCode</string>
+    <string name="toCaptureFace">toCaptureFace</string>
+</resources>
